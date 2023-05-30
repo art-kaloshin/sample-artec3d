@@ -42,7 +42,7 @@
                 from reservation
                 where reservation.reserved_at >= '2022-01-01 00:00' and reservation.reserved_at <= '2022-12-31 23:59:59'
                 group by room_number having count(reservation.id) < 2
-            ) group by room_number
+            ) and check_in_date < now() group by room_number
         ) as room_date
     where r.room_number = room_date.room_number
     and r.check_in_date = room_date.check_in
