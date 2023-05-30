@@ -33,27 +33,6 @@
 
 ### Решение
 
-Вариант 1
-
-    select reservation.room_number, p.first_name, p.last_name
-    from reservation
-    left join person p on p.id = reservation.person_id
-    where reservation.room_number in (
-        select room_number as reservationRooms
-        from reservation
-        where reservation.reserved_at >= '2022-01-01 00:00' and reservation.reserved_at <= '2022-12-31 23:59:59'
-        group by room_number having count(reservation.id) > 1
-    ) and reservation.check_in_date in (
-        select max(check_in_date) from reservation where reservation.room_number in (
-            select room_number as reservationRooms
-            from reservation
-            where reservation.reserved_at >= '2022-01-01 00:00' and reservation.reserved_at <= '2022-12-31 23:59:59'
-            group by room_number having count(reservation.id) > 1
-        ) group by room_number
-    )
-
-Вариант 2
-
     select r.room_number, p.first_name, p.last_name
     from reservation as r,
         person as p,
@@ -62,7 +41,7 @@
                 select room_number as reservationRooms
                 from reservation
                 where reservation.reserved_at >= '2022-01-01 00:00' and reservation.reserved_at <= '2022-12-31 23:59:59'
-                group by room_number having count(reservation.id) > 1
+                group by room_number having count(reservation.id) < 2
             ) group by room_number
         ) as room_date
     where r.room_number = room_date.room_number
